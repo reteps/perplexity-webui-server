@@ -2,3 +2,4 @@
 **/.perplexity_session
 **/.perplexity_files_url
 .env
+.aider*
