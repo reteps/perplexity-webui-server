@@ -6,6 +6,7 @@ from dotenv import load_dotenv, find_dotenv
 import uvicorn
 import os
 
+from typing import Any, AsyncIterator, Dict, Literal, Sequence
 from langchain_openai_api_bridge.core.create_agent_dto import CreateAgentDto
 from langchain_openai_api_bridge.assistant import (
     InMemoryMessageRepository,
@@ -15,9 +16,9 @@ from langchain_openai_api_bridge.assistant import (
 from langchain_openai_api_bridge.fastapi.langchain_openai_api_bridge_fastapi import (
     LangchainOpenaiApiBridgeFastAPI
 )
-from langchain_openai_api_bridge.core.function_agent_factory import FunctionAgentFactory
+from langchain_core.runnables.config import RunnableConfig
 from perplexity_webui_langchain import PerplexityWebUIChatModel
-
+from langchain_core.runnables.schema import StandardStreamEvent, CustomStreamEvent
 _ = load_dotenv(find_dotenv())
 
 
@@ -46,13 +47,33 @@ in_memory_thread_repository = InMemoryThreadRepository()
 in_memory_message_repository = InMemoryMessageRepository()
 in_memory_run_repository = InMemoryRunRepository()
 
+class PerplexityWebUIOpenAICompatibleChatModel(PerplexityWebUIChatModel):
+    def astream_events(self, input: Any, config: RunnableConfig | None = None, *, version: Literal['v1', 'v2'], 
+                             include_names: Sequence[str] | None = None, 
+                             include_types: Sequence[str] | None = None, 
+                             include_tags: Sequence[str] | None = None, 
+                             exclude_names: Sequence[str] | None = None, 
+                             exclude_types: Sequence[str] | None = None, 
+                             exclude_tags: Sequence[str] | None = None, **kwargs: Any) -> AsyncIterator[StandardStreamEvent | CustomStreamEvent]:
+        if type(input) == dict:
+            if 'messages' in input:
+                input = input['messages']
+
+        return super().astream_events(input=input, config=config, version=version, include_names=include_names, include_types=include_types, include_tags=include_tags, exclude_names=exclude_names, exclude_types=exclude_types, exclude_tags=exclude_tags, **kwargs)
+
 def create_agent(dto: CreateAgentDto):
-    agent = PerplexityWebUIChatModel(email=os.getenv("PERPLEXITY_WEBUI_EMAIL"))
+    agent = PerplexityWebUIOpenAICompatibleChatModel(email=os.getenv("PERPLEXITY_WEBUI_EMAIL"))
     return agent
 
 bridge = LangchainOpenaiApiBridgeFastAPI(app=app, agent_factory_provider=create_agent)
 
 bridge.bind_openai_chat_completion(prefix="")
+bridge.bind_openai_assistant_api(
+    thread_repository_provider=in_memory_thread_repository,
+    message_repository_provider=in_memory_message_repository,
+    run_repository_provider=in_memory_run_repository,
+    prefix="",
+)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0")
