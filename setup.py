@@ -11,5 +11,12 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/reteps/perplexity-webui-langchain",
     packages=find_packages(),
-    install_requires=["perplexity_webui_langchain@git+https://github.com/reteps/perplexity-webui-langchain.git", "langchain-openai-api-bridge", "fastapi", "python-dotenv", "uvicorn", "langgraph"],
+    install_requires=[
+        "perplexity_webui_langchain@git+https://github.com/reteps/perplexity-webui-langchain.git",
+        "langchain-openai-api-bridge",
+        "fastapi",
+        "python-dotenv",
+        "uvicorn",
+        "langgraph",
+    ],
 )
