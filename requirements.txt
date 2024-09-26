@@ -1,0 +1,6 @@
+git+https://github.com/reteps/perplexity-webui-langchain.git
+langchain-openai-api-bridge
+fastapi
+python-dotenv
+uvicorn
+langgraph

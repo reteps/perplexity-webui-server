@@ -1,0 +1,3 @@
+*.egg-info
+**/.perplexity_session
+.env
