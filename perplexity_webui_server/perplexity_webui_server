@@ -16,7 +16,7 @@ from langchain_openai_api_bridge.fastapi.langchain_openai_api_bridge_fastapi imp
     LangchainOpenaiApiBridgeFastAPI
 )
 from langchain_openai_api_bridge.core.function_agent_factory import FunctionAgentFactory
-from perplexity_webui_langchain import PerplexityWebUILLM
+from perplexity_webui_langchain import PerplexityWebUIChatModel
 
 _ = load_dotenv(find_dotenv())
 
@@ -47,7 +47,7 @@ in_memory_message_repository = InMemoryMessageRepository()
 in_memory_run_repository = InMemoryRunRepository()
 
 def create_agent(dto: CreateAgentDto):
-    agent = PerplexityWebUILLM(email=os.getenv("PERPLEXITY_WEBUI_EMAIL"))
+    agent = PerplexityWebUIChatModel(email=os.getenv("PERPLEXITY_WEBUI_EMAIL"))
     return agent
 
 bridge = LangchainOpenaiApiBridgeFastAPI(app=app, agent_factory_provider=create_agent)
