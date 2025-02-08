@@ -10,6 +10,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/reteps/perplexity-webui-langchain",
+    scripts=['perplexity_webui_server/perplexity_webui_server'],
     packages=find_packages(),
     install_requires=[
         "perplexity_webui_langchain@git+https://github.com/reteps/perplexity-webui-langchain.git",
